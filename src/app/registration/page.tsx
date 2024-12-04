@@ -1,6 +1,8 @@
 "use client";
-
-import { Formik, Field, Form, FormikHelpers } from "formik";
+import Button from "@/components/Button";
+import Label from "@/components/Label";
+import Textfield from "@/components/Textfield";
+import { Formik, Form, FormikHelpers } from "formik";
 import * as Yup from "yup";
 
 interface Values {
@@ -9,6 +11,7 @@ interface Values {
   password: string;
   confirmPassword: string;
 }
+
 export default function Registration() {
   const RegistrationSchema = Yup.object().shape({
     username: Yup.string()
@@ -17,12 +20,14 @@ export default function Registration() {
       .required("Required"),
     email: Yup.string().email("Invalid email").required("Required"),
     password: Yup.string()
-      .min(8, "Too Short!")
-      .max(15, "Too Long!")
-      .required("Required"),
+      .min(8, "Password must be 8 characters long")
+      .matches(/[0-9]/, "Password requires a number")
+      .matches(/[a-z]/, "Password requires a lowercase letter")
+      .matches(/[A-Z]/, "Password requires an uppercase letter")
+      .matches(/[^\w]/, "Password requires a symbol"),
     confirmPassword: Yup.string().oneOf(
-      [Yup.ref("password"), ""],
-      "Passwords must match"
+      [Yup.ref("pass")],
+      'Must match "password" field value'
     ),
   });
 
@@ -52,70 +57,62 @@ export default function Registration() {
             }, 500);
           }}>
           <Form className="space-y-6">
-            <label
-              htmlFor="email"
-              className="block text-sm/6 font-medium text-gray-900">
-              Username
-            </label>
-            <div className="mt-2">
-              <Field
-                id="username"
-                name="username"
-                placeholder="username"
-                type="username"
-                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                required
-              />
-            </div>
-            <label
-              htmlFor="email"
-              className="block text-sm/6 font-medium text-gray-900">
-              Email
-            </label>
-            <div className="mt-2">
-              <Field
-                id="email"
-                name="email"
-                placeholder="john@acme.com"
-                type="email"
-                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                required
-              />
-            </div>
-
-            <label
+            <Label
+              htmlFor="username"
+              className="block text-sm/6 font-medium text-gray-900"
+              text="Username"
+            />
+            <Textfield
+              id="username"
+              name="username"
+              placeholder="username"
+              type="username"
+              className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+              required={true}
+            />
+            <Label
               htmlFor="password"
-              className="block text-sm/6 font-medium text-gray-900">
-              Password
-            </label>
-
-            <Field
+              className="block text-sm/6 font-medium text-gray-900"
+              text="Email"
+            />
+            <Textfield
+              id="email"
+              name="email"
+              placeholder="john@acme.com"
+              type="email"
+              className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+              required={true}
+            />
+            <Label
+              htmlFor="password"
+              className="block text-sm/6 font-medium text-gray-900"
+              text="Password"
+            />
+            <Textfield
               id="password"
               name="password"
               placeholder="password"
               type="password"
               className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+              required={true}
             />
-
-            <label
+            <Label
               htmlFor="confirmPassword"
-              className="block text-sm/6 font-medium text-gray-900">
-              Confirm Password
-            </label>
-
-            <Field
+              className="block text-sm/6 font-medium text-gray-900"
+              text="Confirm Password"
+            />
+            <Textfield
               id="confirmPassword"
               name="confirmPassword"
-              placeholder="confirmPassword"
+              placeholder="confirm password"
               type="password"
               className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+              required={false}
             />
-
-            <button
-              type="submit"
-              className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-              Submit
-            </button>
+            <Button
+              className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              text="Submit"
+            />
           </Form>
         </Formik>
       </div>
