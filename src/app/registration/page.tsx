@@ -21,6 +21,7 @@ export default function Registration() {
     email: Yup.string().email("Invalid email").required("Required"),
     password: Yup.string()
       .min(8, "Password must be 8 characters long")
+      .required("Required")
       .matches(/[0-9]/, "Password requires a number")
       .matches(/[a-z]/, "Password requires a lowercase letter")
       .matches(/[A-Z]/, "Password requires an uppercase letter")
@@ -32,9 +33,9 @@ export default function Registration() {
   });
 
   return (
-    <div>
+    <div className="bg-white mx-auto my-72 w-96 p-6 rounded-md">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
+        <h2 className="text-center text-2xl/9 font-bold tracking-tight text-gray-900">
           Registration
         </h2>
       </div>
