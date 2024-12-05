@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
+import { Formik, Form, FormikHelpers } from "formik";
+import { useState } from "react";
 import Button from "@/components/Button";
 import Label from "@/components/Label";
 import Textfield from "@/components/Textfield";
-import { Formik, Form, FormikHelpers } from "formik";
-import * as Yup from "yup";
 
 interface Values {
   username: string;
@@ -13,24 +14,11 @@ interface Values {
 }
 
 export default function Registration() {
-  const RegistrationSchema = Yup.object().shape({
-    username: Yup.string()
-      .min(8, "Too Short!")
-      .max(15, "Too Long!")
-      .required("Required"),
-    email: Yup.string().email("Invalid email").required("Required"),
-    password: Yup.string()
-      .min(8, "Password must be 8 characters long")
-      .required("Required")
-      .matches(/[0-9]/, "Password requires a number")
-      .matches(/[a-z]/, "Password requires a lowercase letter")
-      .matches(/[A-Z]/, "Password requires an uppercase letter")
-      .matches(/[^\w]/, "Password requires a symbol"),
-    confirmPassword: Yup.string().oneOf(
-      [Yup.ref("pass")],
-      'Must match "password" field value'
-    ),
-  });
+  const [isPasswordMatch, setIsPasswordMatch] = useState(true);
+  const [isPasswordStrong, setIsPasswordStrong] = useState(true);
+
+  const validPassword: RegExp =
+    /^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z]).{8,}$/;
 
   return (
     <div className="bg-white mx-auto my-72 w-96 p-6 rounded-md">
@@ -47,15 +35,35 @@ export default function Registration() {
             password: "",
             confirmPassword: "",
           }}
-          validationSchema={RegistrationSchema}
           onSubmit={(
             values: Values,
             { setSubmitting }: FormikHelpers<Values>
           ) => {
-            setTimeout(() => {
-              alert(JSON.stringify(values, null, 2));
-              setSubmitting(false);
-            }, 500);
+            if (!validPassword.test(values.password)) {
+              setIsPasswordStrong(false);
+              console.log(
+                "Password strength is not enough",
+                validPassword.test(values.password)
+              );
+            } else {
+              setIsPasswordStrong(true);
+            }
+
+            if (values.password !== values.confirmPassword) {
+              setIsPasswordMatch(false);
+              console.log("Password do not match");
+            } else {
+              setIsPasswordMatch(true);
+            }
+
+            if (isPasswordMatch && isPasswordStrong) {
+              console.log("Values", values);
+
+              setTimeout(() => {
+                alert(JSON.stringify(values, null, 2));
+                setSubmitting(false);
+              }, 500);
+            }
           }}>
           <Form className="space-y-6">
             <Label
@@ -97,6 +105,14 @@ export default function Registration() {
               className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
               required={true}
             />
+
+            {!isPasswordStrong && (
+              <Label
+                htmlFor="password"
+                className="text-sm/3 font-bold text-red-600"
+                text="Password strength is not enough"
+              />
+            )}
             <Label
               htmlFor="confirmPassword"
               className="block text-sm/6 font-medium text-gray-900"
@@ -110,6 +126,13 @@ export default function Registration() {
               className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
               required={false}
             />
+            {!isPasswordMatch && (
+              <Label
+                htmlFor="confirmPassword"
+                className="text-sm/3 font-bold text-red-600 "
+                text="Password do not match"
+              />
+            )}
             <Button
               className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               text="Submit"
