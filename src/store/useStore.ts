@@ -2,7 +2,6 @@
 import { create } from "zustand";
 import { publicApiInstance } from "@/utils/axiosInstance";
 import { RegisterType, LoginType, LoginResponseType } from "@/types/types";
-
 interface State {
   data: { accessToken: string } | unknown;
   isLoading: boolean;
@@ -12,6 +11,7 @@ interface State {
   registerData: (registerDataPayload: RegisterType) => Promise<void>;
   loginData: (loginDataPayload: LoginType) => Promise<void>;
   resetRegisterData: () => void;
+  resetError: () => void;
 }
 
 const useStore = create<State>((set) => ({
@@ -61,6 +61,9 @@ const useStore = create<State>((set) => ({
   },
   resetRegisterData: () => {
     set({ data: null });
+  },
+  resetError: () => {
+    set({ error: null });
   },
 }));
 

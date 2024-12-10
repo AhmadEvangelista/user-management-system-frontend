@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import { Formik, Form } from "formik";
+import { useRouter } from "next/navigation";
 import Button from "@/components/Button";
 import Label from "@/components/Label";
 import Textfield from "@/components/Textfield";
@@ -8,23 +9,29 @@ import useStore from "@/store/useStore";
 import { LoginType, Values } from "@/types/types";
 
 export default function Login() {
-  const isLoading = useStore((state) => state.isLoading);
+  const router = useRouter();
   const error = useStore((state) => state.error);
+  const resetError = useStore((state) => state.resetError);
   const accessToken = useStore((state) => state.accessToken);
   const loginData = useStore((state) => state.loginData);
 
-  if (isLoading) return <p>Loading...</p>;
   if (error)
     return (
-      <Label
-        htmlFor="Error"
-        className="block text-sm/6 font-medium text-gray-900"
-        text={String(error)}
-      />
+      <div className="bg-white mx-auto my-72 w-96 p-6 rounded-md">
+        <div className="flex justify-center pb-4">
+          <strong className="flex text-black">Error: {String(error)}</strong>
+        </div>
+        <button
+          onClick={resetError}
+          className="flex w-full justify-center rounded-md bg-red-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">
+          Close
+        </button>
+      </div>
     );
 
   if (accessToken) {
-    return localStorage.setItem("accessToken", String(accessToken));
+    localStorage.setItem("accessToken", String(accessToken));
+    return router.push("/profile");
   }
 
   return (
