@@ -17,12 +17,12 @@ const protectedApiInstance = axios.create({
 
 protectedApiInstance.interceptors.request.use(
   (config) => config,
-  (error) => Promise.reject(error)
+  (error) => error.response.data
 );
 
 protectedApiInstance.interceptors.response.use(
   (config) => config,
-  (error) => Promise.reject(error)
+  (error) => error.response.data
 );
 
 const publicApiInstance = axios.create({
@@ -36,12 +36,12 @@ const publicApiInstance = axios.create({
 
 publicApiInstance.interceptors.request.use(
   (config) => config,
-  (error) => Promise.reject(error)
+  (error) => error.response.data
 );
 
 publicApiInstance.interceptors.response.use(
   (config) => config,
-  (error) => Promise.reject(error)
+  (error) => error.response.data
 );
 
 export { publicApiInstance, protectedApiInstance };
