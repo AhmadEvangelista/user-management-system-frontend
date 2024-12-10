@@ -1,35 +1,45 @@
-// utils/axiosInstance.js
 import axios from "axios";
+import "dotenv/config";
 
 const getToken = () => {
   return localStorage.getItem("accessToken");
 };
 
-const axiosInstance = axios.create({
-  baseURL: process.env.BASE_URL || "https://api.example.com",
-  timeout: 10000, // Set a timeout for requests
+const protectedApiInstance = axios.create({
+  baseURL: process.env.BASE_URL,
+  headers: {
+    Authorization: `Bearer ${getToken}`,
+    "__Host-psifi.x-csrf-token": process.env.CSRF_SECRET,
+  },
+  timeout: 10000,
 });
 
-// Add a request interceptor (optional)
-axiosInstance.interceptors.request.use(
-  (config) => {
-    // You can add authorization headers here if needed
-    config.headers["Authorization"] = `Bearer ${getToken}`;
-    config.headers[
-      "__Host-psifi.x-csrf-token"
-    ] = `Bearer ${process.env.CSRF_SECRET}`;
-    return config;
-  },
+protectedApiInstance.interceptors.request.use(
+  (config) => config,
   (error) => Promise.reject(error)
 );
 
-// Add a response interceptor (optional)
-axiosInstance.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    // Handle errors
-    return Promise.reject(error);
-  }
+protectedApiInstance.interceptors.response.use(
+  (config) => config,
+  (error) => Promise.reject(error)
 );
 
-export default axiosInstance;
+const publicApiInstance = axios.create({
+  baseURL: process.env.BASE_URL,
+  headers: {
+    "__Host-psifi.x-csrf-token": process.env.CSRF_SECRET,
+  },
+  timeout: 10000,
+});
+
+publicApiInstance.interceptors.request.use(
+  (config) => config,
+  (error) => Promise.reject(error)
+);
+
+publicApiInstance.interceptors.response.use(
+  (config) => config,
+  (error) => Promise.reject(error)
+);
+
+export { publicApiInstance, protectedApiInstance };

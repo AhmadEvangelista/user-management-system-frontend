@@ -5,6 +5,8 @@ import { useState } from "react";
 import Button from "@/components/Button";
 import Label from "@/components/Label";
 import Textfield from "@/components/Textfield";
+import useStore from "@/store/useStore";
+import { RegisterType } from "@/types/types";
 
 interface Values {
   username: string;
@@ -14,11 +16,18 @@ interface Values {
 }
 
 export default function Registration() {
+  const { isLoading, error, registerData } = useStore();
+
   const [isPasswordMatch, setIsPasswordMatch] = useState(true);
   const [isPasswordStrong, setIsPasswordStrong] = useState(true);
 
   const validPassword: RegExp =
     /^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z]).{8,}$/;
+
+  if (isLoading) return <p>Loading...</p>;
+  if (error) return <p>Error: {JSON.stringify(error)}</p>;
+
+  console.log("ENV", process.env.BASE_URL);
 
   return (
     <div className="bg-white mx-auto my-72 w-96 p-6 rounded-md">
@@ -35,7 +44,7 @@ export default function Registration() {
             password: "",
             confirmPassword: "",
           }}
-          onSubmit={(
+          onSubmit={async (
             values: Values,
             { setSubmitting }: FormikHelpers<Values>
           ) => {
@@ -57,12 +66,14 @@ export default function Registration() {
             }
 
             if (isPasswordMatch && isPasswordStrong) {
-              console.log("Values", values);
+              const registerDataPayload: RegisterType = {
+                username: values.username,
+                email: values.email,
+                password: values.password,
+              };
 
-              setTimeout(() => {
-                alert(JSON.stringify(values, null, 2));
-                setSubmitting(false);
-              }, 500);
+              console.log("Values", values, process.env.BASE_URL);
+              await registerData(registerDataPayload);
             }
           }}>
           <Form className="space-y-6">

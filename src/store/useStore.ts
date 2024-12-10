@@ -1,12 +1,13 @@
 // store/useStore.js
 import { create } from "zustand";
-import axiosInstance from "../utils/axiosInstance";
+import { publicApiInstance } from "@/utils/axiosInstance";
+import { RegisterType } from "@/types/types";
 
 interface State {
   data: unknown;
   isLoading: boolean;
   error: string | null | unknown;
-  fetchData: () => Promise<void>;
+  registerData: (registerDataPayload: RegisterType) => Promise<void>;
 }
 
 const useStore = create<State>((set) => ({
@@ -14,10 +15,17 @@ const useStore = create<State>((set) => ({
   isLoading: false,
   error: null,
 
-  fetchData: async () => {
+  registerData: async (registerDataPayload: RegisterType) => {
+    console.log("ENDPOINT register");
+
     set({ isLoading: true, error: null });
     try {
-      const response = await axiosInstance.get("/endpoint");
+      const response = await publicApiInstance.post(
+        "/auth/register",
+        registerDataPayload
+      );
+      console.log("ENDPOINT register data", response);
+
       set({ data: response.data, isLoading: false });
     } catch (error) {
       const errorMessage =
