@@ -7,6 +7,7 @@ import Label from "@/components/Label";
 import Textfield from "@/components/Textfield";
 import useStore from "@/store/useStore";
 import { RegisterType } from "@/types/types";
+import Modal from "@/components/Modal";
 
 interface Values {
   username: string;
@@ -26,7 +27,8 @@ export default function Registration() {
 
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error: {JSON.stringify(error)}</p>;
-  if (data) {
+  if (true) {
+    return <Modal />;
   }
 
   return (
