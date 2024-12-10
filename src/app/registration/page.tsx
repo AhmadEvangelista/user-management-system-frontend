@@ -16,7 +16,7 @@ interface Values {
 }
 
 export default function Registration() {
-  const { isLoading, error, registerData } = useStore();
+  const { data, isLoading, error, registerData } = useStore();
 
   const [isPasswordMatch, setIsPasswordMatch] = useState(true);
   const [isPasswordStrong, setIsPasswordStrong] = useState(true);
@@ -26,8 +26,8 @@ export default function Registration() {
 
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error: {JSON.stringify(error)}</p>;
-
-  console.log("ENV", process.env.BASE_URL);
+  if (data) {
+  }
 
   return (
     <div className="bg-white mx-auto my-72 w-96 p-6 rounded-md">
@@ -44,10 +44,10 @@ export default function Registration() {
             password: "",
             confirmPassword: "",
           }}
-          onSubmit={async (
-            values: Values,
-            { setSubmitting }: FormikHelpers<Values>
-          ) => {
+          onSubmit={async (values: Values) => {
+            const event = new Event("submit");
+            event.preventDefault();
+
             if (!validPassword.test(values.password)) {
               setIsPasswordStrong(false);
               console.log(
