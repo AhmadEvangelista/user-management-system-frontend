@@ -2,18 +2,26 @@
 "use client";
 import { Formik, Form } from "formik";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import Button from "@/components/Button";
 import Label from "@/components/Label";
 import Textfield from "@/components/Textfield";
-import useStore from "@/store/useStore";
+import useLoginStore from "@/store/login/login.store";
 import { LoginType, Values } from "@/types/types";
 
 export default function Login() {
   const router = useRouter();
-  const error = useStore((state) => state.error);
-  const resetError = useStore((state) => state.resetError);
-  const accessToken = useStore((state) => state.accessToken);
-  const loginData = useStore((state) => state.loginData);
+  const error = useLoginStore((state) => state.error);
+  const resetError = useLoginStore((state) => state.resetError);
+  const accessToken = useLoginStore((state) => state.accessToken);
+  const login = useLoginStore((state) => state.login);
+
+  useEffect(() => {
+    if (accessToken) {
+      localStorage.setItem("accessToken", String(accessToken));
+      return router.push("/profile");
+    }
+  }, [accessToken, router]);
 
   if (error)
     return (
@@ -28,11 +36,6 @@ export default function Login() {
         </button>
       </div>
     );
-
-  if (accessToken) {
-    localStorage.setItem("accessToken", String(accessToken));
-    return router.push("/profile");
-  }
 
   return (
     <div className="bg-white mx-auto my-72 w-96 p-6 rounded-md">
@@ -58,7 +61,7 @@ export default function Login() {
               password: values.password,
             };
             try {
-              await loginData(loginDataPayload);
+              await login(loginDataPayload);
             } catch (error) {
               console.log(error);
             }

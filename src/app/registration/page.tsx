@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import { Formik, Form, FormikHelpers } from "formik";
-import { ChangeEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "@/components/Button";
 import Label from "@/components/Label";
 import Textfield from "@/components/Textfield";
-import useStore from "@/store/useStore";
+import useRegisterStore from "@/store/register/register.store";
 import { RegisterType } from "@/types/types";
 import Modal from "@/components/Modal";
 
@@ -17,11 +17,13 @@ interface Values {
 }
 
 export default function Registration() {
-  const isLoading = useStore((state) => state.isLoading);
-  const error = useStore((state) => state.error);
-  const data = useStore((state) => state.data);
-  const registerData = useStore((state) => state.registerData);
-  const resetRegisterData = useStore((state) => state.resetRegisterData);
+  const isLoading = useRegisterStore((state) => state.isLoading);
+  const error = useRegisterStore((state) => state.error);
+  const data = useRegisterStore((state) => state.data);
+  const register = useRegisterStore((state) => state.register);
+  const resetRegisterData = useRegisterStore(
+    (state) => state.resetRegisterData
+  );
 
   const [isPasswordMatch, setIsPasswordMatch] = useState(true);
   const [isPasswordStrong, setIsPasswordStrong] = useState(true);
@@ -39,22 +41,16 @@ export default function Registration() {
       setIsPasswordStrong(true);
     }
 
-    const register = async () => {
-      const registerDataPayload: RegisterType = {
-        username: values.username,
-        email: values.email,
-        password: values.password,
-      };
-
-      await registerData(registerDataPayload);
-    };
-
     if (
       isPasswordStrong &&
       isPasswordStrong &&
       values.password === values.confirmPassword
     ) {
-      register();
+      register({
+        username: values.username,
+        email: values.email,
+        password: values.password,
+      });
     } else {
       setIsPasswordMatch(false);
     }
