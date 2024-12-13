@@ -8,6 +8,7 @@ import Label from "@/components/Label";
 import Textfield from "@/components/Textfield";
 import useLoginStore from "@/store/login/login.store";
 import { LoginType, Values } from "@/types/types";
+import isTokenExpired from "@/utils/isTokenEpred";
 
 export default function Login() {
   const router = useRouter();
@@ -15,13 +16,22 @@ export default function Login() {
   const resetError = useLoginStore((state) => state.resetError);
   const accessToken = useLoginStore((state) => state.accessToken);
   const login = useLoginStore((state) => state.login);
+  const oldAccessToken = localStorage.getItem("accessToken");
+  console.log("RERENDER LOGIN");
 
   useEffect(() => {
     if (accessToken) {
       localStorage.setItem("accessToken", String(accessToken));
-      return router.push("/profile");
+      router.replace("/profile");
+      return;
     }
-  }, [accessToken, router]);
+
+    if (oldAccessToken) {
+      if (!isTokenExpired(String(oldAccessToken))) {
+        router.replace("/profile");
+      }
+    }
+  }, [accessToken, oldAccessToken, router]);
 
   if (error)
     return (
