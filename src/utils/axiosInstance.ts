@@ -1,14 +1,11 @@
 import axios from "axios";
 import "dotenv/config";
-
-const getToken = () => {
-  return localStorage.getItem("accessToken");
-};
+import getToken from "./getToken";
 
 const protectedApiInstance = axios.create({
   baseURL: process.env.BASE_URL,
   headers: {
-    Authorization: `Bearer ${getToken}`,
+    Authorization: `Bearer ${getToken()}`,
     "Content-Type": "application/json",
     "__Host-psifi.x-csrf-token": process.env.CSRF_SECRET,
   },

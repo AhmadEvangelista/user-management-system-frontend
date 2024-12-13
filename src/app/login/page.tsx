@@ -1,31 +1,55 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import { Formik, Form } from "formik";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import Button from "@/components/Button";
 import Label from "@/components/Label";
 import Textfield from "@/components/Textfield";
-import useStore from "@/store/useStore";
+import useLoginStore from "@/store/login/login.store";
+import useProfileStore from "@/store/profile/profile.store";
 import { LoginType, Values } from "@/types/types";
+import isTokenExpired from "@/utils/isTokenEpred";
+import getToken from "@/utils/getToken";
 
 export default function Login() {
-  const isLoading = useStore((state) => state.isLoading);
-  const error = useStore((state) => state.error);
-  const accessToken = useStore((state) => state.accessToken);
-  const loginData = useStore((state) => state.loginData);
+  const router = useRouter();
+  const error = useLoginStore((state) => state.error);
+  const resetError = useLoginStore((state) => state.resetError);
+  const accessToken = useLoginStore((state) => state.accessToken);
+  const login = useLoginStore((state) => state.login);
+  const setIsLoading = useProfileStore((state) => state.setIsLoading);
+  console.log("RERENDER LOGIN");
 
-  if (isLoading) return <p>Loading...</p>;
+  useEffect(() => {
+    if (accessToken) {
+      localStorage.setItem("accessToken", String(accessToken));
+      if (String(getToken()).length > 0) {
+        router.replace("/profile");
+        return;
+      }
+    }
+    setIsLoading();
+    if (String(getToken()).length > 0) {
+      if (!isTokenExpired(String(getToken()))) {
+        router.replace("/profile");
+      }
+    }
+  }, [accessToken, router]);
+
   if (error)
     return (
-      <Label
-        htmlFor="Error"
-        className="block text-sm/6 font-medium text-gray-900"
-        text={String(error)}
-      />
+      <div className="bg-white mx-auto my-72 w-96 p-6 rounded-md">
+        <div className="flex justify-center pb-4">
+          <strong className="flex text-black">Error: {String(error)}</strong>
+        </div>
+        <button
+          onClick={resetError}
+          className="flex w-full justify-center rounded-md bg-red-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">
+          Close
+        </button>
+      </div>
     );
-
-  if (accessToken) {
-    return localStorage.setItem("accessToken", String(accessToken));
-  }
 
   return (
     <div className="bg-white mx-auto my-72 w-96 p-6 rounded-md">
@@ -51,7 +75,7 @@ export default function Login() {
               password: values.password,
             };
             try {
-              await loginData(loginDataPayload);
+              await login(loginDataPayload);
             } catch (error) {
               console.log(error);
             }

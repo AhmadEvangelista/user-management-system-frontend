@@ -1,17 +1,15 @@
-// store/useStore.js
 import { create } from "zustand";
 import { publicApiInstance } from "@/utils/axiosInstance";
-import { RegisterType, LoginType, LoginResponseType } from "@/types/types";
+import { LoginType, LoginResponseType } from "@/store/login/login.type";
 
 interface State {
-  data: { accessToken: string } | unknown;
+  data: { accessToken: string } | null;
   isLoading: boolean;
   error: string | null | unknown;
   accessToken: string | null | unknown;
 
-  registerData: (registerDataPayload: RegisterType) => Promise<void>;
-  loginData: (loginDataPayload: LoginType) => Promise<void>;
-  resetRegisterData: () => void;
+  login: (loginDataPayload: LoginType) => Promise<void>;
+  resetError: () => void;
 }
 
 const useStore = create<State>((set) => ({
@@ -20,25 +18,7 @@ const useStore = create<State>((set) => ({
   error: null,
   accessToken: null,
 
-  registerData: async (registerDataPayload: RegisterType) => {
-    set({ isLoading: true, error: null });
-    try {
-      const response = await publicApiInstance.post(
-        "/auth/register",
-        registerDataPayload
-      );
-
-      set({ data: response.data, isLoading: false });
-    } catch (error) {
-      const errorMessage =
-        typeof error === "object" && error !== null && "message" in error
-          ? (error as Error).message
-          : "An unknown error occurred";
-      set({ error: errorMessage, isLoading: false });
-    }
-  },
-
-  loginData: async (loginDataPayload: LoginType) => {
+  login: async (loginDataPayload: LoginType) => {
     set({ isLoading: true, error: null });
     try {
       const response: LoginResponseType = await publicApiInstance.post(
@@ -59,8 +39,8 @@ const useStore = create<State>((set) => ({
       set({ error: errorMessage, isLoading: false });
     }
   },
-  resetRegisterData: () => {
-    set({ data: null });
+  resetError: () => {
+    set({ error: null });
   },
 }));
 
