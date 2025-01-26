@@ -13,6 +13,7 @@ export default function Profile() {
   const error = useProfileStore((state) => state.error);
   const resetError = useProfileStore((state) => state.resetError);
   const data = useProfileStore((state) => state.data);
+  const updateProfileInfo = useProfileStore((state) => state.updateProfileInfo);
   const accessToken = getToken();
   const [isDisabled, setIsDisabled] = useState(true);
   const [isSave, setIsSave] = useState(false);
@@ -102,7 +103,7 @@ export default function Profile() {
             </button>
             <button
               className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-              onClick={() => {
+              onClick={async () => {
                 if (isSave) {
                   console.log("SAVE BUTTON CLICKED");
                   setIsDisabled(true);
@@ -110,12 +111,19 @@ export default function Profile() {
                   // check fields if the same with data
                   // else save the refetch new data
 
-                  let payload: { username: string; email: string } | {} = {};
+                  const payload: Partial<{ username: string; email: string }> =
+                    {};
                   if (username !== data?.username) {
                     payload.username = username;
                   }
                   if (email !== data?.email) {
                     payload.email = email;
+                  }
+
+                  try {
+                    await updateProfileInfo(String(data?.id), payload);
+                  } catch (error) {
+                    console.log(error);
                   }
                   console.log("payload", payload);
                 } else {
