@@ -10,6 +10,7 @@ interface State {
 
   login: (loginDataPayload: LoginType) => Promise<void>;
   resetError: () => void;
+  resetData: () => void;
 }
 
 const useStore = create<State>((set) => ({
@@ -41,6 +42,9 @@ const useStore = create<State>((set) => ({
   },
   resetError: () => {
     set({ error: null });
+  },
+  resetData: () => {
+    set({ accessToken: null });
   },
 }));
 
