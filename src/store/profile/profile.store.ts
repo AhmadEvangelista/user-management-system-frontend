@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { protectedApiInstance } from "@/utils/axiosInstance";
 import { ErrorResponseType, SuccessResponseType } from "./profile.type";
+import { AxiosResponse } from "axios";
 
 // State Interface
 interface State {
@@ -17,10 +18,13 @@ interface State {
   resetError: () => void;
   setIsLoading: () => void;
   profileInfo: (id: string) => Promise<void>;
-  updateProfileInfo: (payload: {
-    username?: string;
-    email?: string;
-  }) => Promise<void>;
+  updateProfileInfo: (
+    id: string,
+    payload: Partial<{
+      username: string;
+      email: string;
+    }>
+  ) => Promise<void>;
 }
 
 // Zustand Store
@@ -44,12 +48,12 @@ const useStore = create<State>((set) => ({
       const response = await protectedApiInstance.get(`/users/${id}`);
 
       // Type narrowing for the response
-      const data: SuccessResponseType = response.data;
-      const errorData: ErrorResponseType | any = response;
+      const data: SuccessResponseType | null = response.data || null;
+      const errorData: ErrorResponseType | null = response?.data.error || null;
 
       // Handle the response based on its type
-      if (errorData?.statusCode === String(401) && data) {
-        console.log("PROFLE STORE error", data);
+      if (errorData && errorData.statusCode === "401" && data) {
+        console.log("PROFILE STORE error", data);
         // Handle error response
         set({ data: null, error: errorData.message, isLoading: false });
       } else {
@@ -69,21 +73,25 @@ const useStore = create<State>((set) => ({
       set({ error: errorMessage, isLoading: false });
     }
   },
-  updateProfileInfo: async (payload) => {
+  updateProfileInfo: async (id, payload) => {
     set({ isLoading: true, error: null });
 
     try {
+      console.log("STORE", id, payload);
+
       // Make the API request
-      const response = await protectedApiInstance.post(
-        `/update-username/${id}`
+      const response = await protectedApiInstance.patch(
+        `/users/update-user-details/${id}`,
+        payload
       );
 
+      console.log("ERROR", response);
       // Type narrowing for the response
       const data: SuccessResponseType = response.data;
-      const errorData: ErrorResponseType | any = response;
+      const errorData: ErrorResponseType = response;
 
       // Handle the response based on its type
-      if (errorData?.statusCode === String(401) && data) {
+      if (errorData.statusCode === String(401) && data) {
         console.log("PROFLE STORE error", data);
         // Handle error response
         set({ data: null, error: errorData.message, isLoading: false });

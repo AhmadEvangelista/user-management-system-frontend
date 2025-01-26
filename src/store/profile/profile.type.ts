@@ -7,5 +7,6 @@ export interface SuccessResponseType {
 
 export interface ErrorResponseType {
   message: string;
-  statusCode: string;
+  error: string;
+  statusCode: number;
 }
