@@ -25,6 +25,8 @@ export default function Login() {
     if (accessToken) {
       localStorage.setItem("accessToken", String(accessToken));
       if (String(getToken()).length > 0) {
+        console.log("RERENDER LOGIN 1");
+
         router.replace("/profile");
         return;
       }
@@ -32,6 +34,8 @@ export default function Login() {
     setIsLoading();
     if (String(getToken()).length > 0) {
       if (!isTokenExpired(String(getToken()))) {
+        console.log("RERENDER LOGIN 2");
+
         router.replace("/profile");
       }
     }

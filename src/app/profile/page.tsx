@@ -105,11 +105,8 @@ export default function Profile() {
               className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
               onClick={async () => {
                 if (isSave) {
-                  console.log("SAVE BUTTON CLICKED");
                   setIsDisabled(true);
                   setIsSave(false);
-                  // check fields if the same with data
-                  // else save the refetch new data
 
                   const payload: Partial<{ username: string; email: string }> =
                     {};
@@ -121,13 +118,14 @@ export default function Profile() {
                   }
 
                   try {
+                    if (username === data?.username && email === data?.email) {
+                      return;
+                    }
                     await updateProfileInfo(String(data?.id), payload);
                   } catch (error) {
                     console.log(error);
                   }
-                  console.log("payload", payload);
                 } else {
-                  console.log("EDIT BUTTON CLICKED");
                   setIsDisabled(false);
                   setIsSave(true);
                 }
